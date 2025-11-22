@@ -517,43 +517,45 @@ extension RagdollBuilder {
         // Torso at center
         torso.position = [0, 0, 0]
 
-        // Head - positioned above torso (in torso's local space since it's a child)
-        let headGap = (props.torsoRadius + props.headRadius) * spacing
+        // Head - positioned close to torso, almost touching
+        let headGap = (props.torsoRadius + props.headRadius) * 0.6  // Reduced from spacing multiplier
         head.position = [0, headGap, 0]  // Local to torso
 
-        // Arms - horizontal positioning with spacing
-        let armHorizontalGap = (props.torsoRadius + props.upperArmLength/2) * spacing
+        // Arms - increased spacing for visual separation (spheres are far apart visually)
+        let sphereRadius = props.upperArmRadius * 2.5  // Visual sphere size
+        let armHorizontalGap = (props.torsoRadius + sphereRadius) * spacing * 1.3
         let armVerticalOffset: Float = props.torsoRadius * 0.5
 
         leftUpperArm.position = [-armHorizontalGap, armVerticalOffset, 0]
         leftLowerArm.position = [
-            -armHorizontalGap - (props.upperArmLength + props.lowerArmLength/2) * spacing,
+            -armHorizontalGap - (sphereRadius * 2) * spacing * 1.5,  // More spacing between arm segments
             armVerticalOffset,
             0
         ]
 
         rightUpperArm.position = [armHorizontalGap, armVerticalOffset, 0]
         rightLowerArm.position = [
-            armHorizontalGap + (props.upperArmLength + props.lowerArmLength/2) * spacing,
+            armHorizontalGap + (sphereRadius * 2) * spacing * 1.5,  // More spacing between arm segments
             armVerticalOffset,
             0
         ]
 
-        // Legs - vertical positioning with spacing
+        // Legs - increased vertical spacing for visual separation
         let legHipWidth = props.torsoRadius * 0.6
-        let legVerticalGap = (props.torsoRadius + props.upperLegLength/2) * spacing
+        let legSphereRadius = props.upperLegRadius * 2.5  // Visual sphere size
+        let legVerticalGap = (props.torsoRadius + legSphereRadius) * spacing * 1.3
 
         leftUpperLeg.position = [-legHipWidth, -legVerticalGap, 0]
         leftLowerLeg.position = [
             -legHipWidth,
-            -legVerticalGap - (props.upperLegLength + props.lowerLegLength/2) * spacing,
+            -legVerticalGap - (legSphereRadius * 2) * spacing * 1.5,  // More spacing between leg segments
             0
         ]
 
         rightUpperLeg.position = [legHipWidth, -legVerticalGap, 0]
         rightLowerLeg.position = [
             legHipWidth,
-            -legVerticalGap - (props.upperLegLength + props.lowerLegLength/2) * spacing,
+            -legVerticalGap - (legSphereRadius * 2) * spacing * 1.5,  // More spacing between leg segments
             0
         ]
     }
@@ -577,10 +579,10 @@ extension RagdollBuilder {
         let props = character.bodyProportions
         let physics = character.physicsProperties
 
-        // Torso - kinematic (70% of visual size for stability)
+        // Torso - kinematic (SMALL collider - 50% of visual for more space)
         StableRagdollPhysics.addKinematicPhysics(
             to: torso,
-            shape: .generateSphere(radius: props.torsoRadius * 0.70),
+            shape: .generateSphere(radius: props.torsoRadius * 0.50),
             mass: physics.torsoMass,
             config: physicsConfig
         )
@@ -588,9 +590,9 @@ extension RagdollBuilder {
         // Head - NO PHYSICS (fixed to torso for stability)
         // Just a visual element, no collision or physics body
 
-        // Arms - SPHERES for maximum stability (70% sizing)
-        let upperArmSphereRadius = props.upperArmRadius * 2.5 * 0.70
-        let lowerArmSphereRadius = props.lowerArmRadius * 2.5 * 0.70
+        // Arms - SPHERES with LARGER colliders (85% of visual size)
+        let upperArmSphereRadius = props.upperArmRadius * 2.5 * 0.85
+        let lowerArmSphereRadius = props.lowerArmRadius * 2.5 * 0.85
 
         StableRagdollPhysics.addDynamicPhysics(
             to: leftUpperArm,
@@ -620,9 +622,9 @@ extension RagdollBuilder {
             isExtremity: true
         )
 
-        // Legs - SPHERES for maximum stability (70% sizing)
-        let upperLegSphereRadius = props.upperLegRadius * 2.5 * 0.70
-        let lowerLegSphereRadius = props.lowerLegRadius * 2.5 * 0.70
+        // Legs - SPHERES with LARGER colliders (85% of visual size)
+        let upperLegSphereRadius = props.upperLegRadius * 2.5 * 0.85
+        let lowerLegSphereRadius = props.lowerLegRadius * 2.5 * 0.85
 
         StableRagdollPhysics.addDynamicPhysics(
             to: leftUpperLeg,
@@ -672,16 +674,16 @@ extension RagdollBuilder {
         let props = character.bodyProportions
         let physics = character.physicsProperties
 
-        // Calculate joint offsets (70% sizing to match colliders)
-        let torsoTop = props.torsoRadius * 0.70
-        let torsoBottom = -props.torsoRadius * 0.70
-        let torsoShoulder = props.torsoRadius * 0.70
+        // Calculate joint offsets (match collider sizing: torso 50%, limbs 85%)
+        let torsoTop = props.torsoRadius * 0.50
+        let torsoBottom = -props.torsoRadius * 0.50
+        let torsoShoulder = props.torsoRadius * 0.50
 
         // NO NECK JOINT - head is fixed to torso as a child entity
 
         // Shoulders - attach to edge of sphere colliders
         let shoulderHorizontalOffset = torsoShoulder
-        let upperArmSphereRadius = props.upperArmRadius * 2.5 * 0.70
+        let upperArmSphereRadius = props.upperArmRadius * 2.5 * 0.85
 
         try StableRagdollPhysics.createSphericalJoint(
             parent: torso,
@@ -700,7 +702,7 @@ extension RagdollBuilder {
         )
 
         // Elbows - attach sphere to sphere
-        let lowerArmSphereRadius = props.lowerArmRadius * 2.5 * 0.70
+        let lowerArmSphereRadius = props.lowerArmRadius * 2.5 * 0.85
 
         try StableRagdollPhysics.createRevoluteJoint(
             parent: leftUpperArm,
@@ -724,7 +726,7 @@ extension RagdollBuilder {
 
         // Hips - attach to edge of sphere colliders
         let hipHorizontalOffset = props.torsoRadius * 0.6
-        let upperLegSphereRadius = props.upperLegRadius * 2.5 * 0.70
+        let upperLegSphereRadius = props.upperLegRadius * 2.5 * 0.85
 
         try StableRagdollPhysics.createSphericalJoint(
             parent: torso,
@@ -743,7 +745,7 @@ extension RagdollBuilder {
         )
 
         // Knees - attach sphere to sphere
-        let lowerLegSphereRadius = props.lowerLegRadius * 2.5 * 0.70
+        let lowerLegSphereRadius = props.lowerLegRadius * 2.5 * 0.85
 
         try StableRagdollPhysics.createRevoluteJoint(
             parent: leftUpperLeg,
