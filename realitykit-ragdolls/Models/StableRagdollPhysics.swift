@@ -6,61 +6,52 @@
 //
 
 /*
- ROOT CAUSES OF INSTABILITY:
+ ROOT CAUSES OF INSTABILITY AND SOLUTIONS:
 
- 1. PENETRATION/COLLISION ISSUES ⚠️ CRITICAL
-    - Colliders at 87-90% still cause overlap during joint movement
-    - No CCD (Continuous Collision Detection) = tunneling through geometry
-    - Initial spawn positions might have colliders touching
-    - Solution: Reduce to 70-75%, enable CCD, increase spawn spacing
-
- 2. MASS/INERTIA MISCONFIGURATION ⚠️ CRITICAL
+ 1. MASS/INERTIA MISCONFIGURATION ⚠️ CRITICAL - ✅ FIXED
     - Current ratios: torso 8.0, limbs 0.4-1.5 = up to 20:1 ratio
     - Extreme ratios destabilize solver (should be max 3:1)
     - Light limbs get "thrown" by heavy torso
     - Solution: Normalize masses (torso 6.0, lightest limb 2.0)
 
- 3. JOINT CONSTRAINT VIOLATIONS ⚠️ HIGH
-    - Joint pins might be inside collider boundaries
-    - Spherical joints with only Y/Z limits (missing X limit)
-    - No maximum swing distance on ball-and-socket joints
-    - Solution: Place pins on collider surface, add all axis limits
+ 2. PENETRATION/COLLISION ISSUES ⚠️ CRITICAL - ✅ FIXED
+    - Colliders at 87-90% still cause overlap during joint movement
+    - Initial spawn positions might have colliders touching
+    - Solution: Reduce to 70%, increase spawn spacing
+    - Note: CCD not available in RealityKit, using smaller colliders instead
 
- 4. ITERATION COUNT ⚠️ MEDIUM
-    - 80 iterations is decent but not enough for complex ragdolls
+ 3. ITERATION COUNT ⚠️ HIGH - ✅ FIXED
+    - 80 iterations is not enough for complex ragdolls
     - Each joint adds constraint complexity
     - 10 body parts + 9 joints = needs ~120-150 iterations
     - Solution: Increase to 150 position, 150 velocity iterations
 
- 5. FRICTION ISSUES ⚠️ MEDIUM
+ 4. FRICTION ISSUES ⚠️ MEDIUM - ✅ FIXED
     - High friction (0.9/0.8) causes "stick-slip" behavior
     - Bodies stick together then suddenly release with force
     - Solution: Reduce to 0.5/0.4 for smoother sliding
 
- 6. NO SLEEP THRESHOLDS ⚠️ MEDIUM
-    - Bodies never rest, constantly micro-jittering
-    - Micro-movements accumulate into chaos
-    - Solution: Add sleep thresholds (linear 0.01, angular 0.01)
+ 5. DAMPING TOO LOW ⚠️ MEDIUM - ✅ FIXED
+    - Insufficient damping allows oscillations to build
+    - Solution: Increase damping significantly (18/12 base, 22/15 extremities)
 
- 7. NO ANGULAR VELOCITY LIMITS ⚠️ LOW
-    - Limbs can spin infinitely fast
-    - Creates huge momentum that destabilizes
-    - Solution: Cap at 20 rad/s (~3 rotations per second)
+ 6. JOINT CONSTRAINT VIOLATIONS ⚠️ MEDIUM - ✅ FIXED
+    - Joint pins placed at collider edges with proper offsets
+    - Angular limits properly configured
 
- 8. EXTERNAL FORCES (DRAG) ⚠️ LOW
-    - Current drag applies position directly (good)
-    - No force amplification detected
-    - Solution: Keep current approach
+ NOTE: Some advanced physics features not available in RealityKit:
+ - CCD (Continuous Collision Detection) - using smaller colliders instead
+ - Sleep thresholds - using high damping instead
+ - Angular velocity limits - using high damping instead
 
- PRIORITY FIX ORDER:
- 1. Enable CCD on all dynamic bodies
- 2. Normalize mass ratios (3:1 max)
- 3. Reduce collider sizes to 70-75%
- 4. Increase solver iterations to 150
- 5. Add sleep thresholds
- 6. Reduce friction to 0.5/0.4
- 7. Add angular velocity limits
- 8. Fix joint pin placement
+ FIXES APPLIED:
+ 1. ✅ Normalize mass ratios (3:1 max)
+ 2. ✅ Reduce collider sizes to 70%
+ 3. ✅ Increase solver iterations to 150
+ 4. ✅ Reduce friction to 0.5/0.4
+ 5. ✅ Increase damping significantly
+ 6. ✅ Fix joint pin placement
+ 7. ✅ Reduce gravity and eliminate bounce
  */
 
 import RealityKit
@@ -74,11 +65,14 @@ enum StableRagdollPhysics {
     private static let colliderSizeMultiplier: Float = 0.70  // 70% of visual (was 87-90%)
     private static let massRatioMax: Float = 3.0            // Maximum mass ratio between parts
     private static let baseMass: Float = 2.0                // Minimum mass for any part
-    private static let maxAngularVelocity: Float = 20.0     // rad/s (~3 rotations/sec)
-    private static let sleepThreshold: Float = 0.01         // For both linear and angular
     private static let staticFriction: Float = 0.5          // Reduced from 0.9
     private static let dynamicFriction: Float = 0.4         // Reduced from 0.8
     private static let restitution: Float = 0.0             // No bounce at all
+
+    // Note: These constants are not used as the properties aren't available in RealityKit
+    // Keeping for documentation purposes
+    // private static let maxAngularVelocity: Float = 20.0  // rad/s (~3 rotations/sec) - NOT AVAILABLE
+    // private static let sleepThreshold: Float = 0.01      // For both linear and angular - NOT AVAILABLE
 
     // MARK: - Improved Physics Setup
 
@@ -132,8 +126,8 @@ enum StableRagdollPhysics {
             mode: .dynamic
         )
 
-        // CRITICAL: Enable CCD to prevent tunneling
-        physicsBody.isCCDEnabled = true
+        // NOTE: CCD, maxAngularVelocity, and sleepThreshold are not available in RealityKit
+        // Relying on mass normalization, damping, and collider sizing for stability instead
 
         // Much higher damping for stability
         if isExtremity {
@@ -143,12 +137,6 @@ enum StableRagdollPhysics {
             physicsBody.angularDamping = config.angularDamping
             physicsBody.linearDamping = config.linearDamping
         }
-
-        // CRITICAL: Add max angular velocity to prevent spinning chaos
-        physicsBody.maxAngularVelocity = maxAngularVelocity
-
-        // CRITICAL: Add sleep thresholds so bodies can rest
-        physicsBody.sleepThreshold = sleepThreshold
 
         entity.components.set(physicsBody)
         entity.components.set(CollisionComponent(shapes: [shape]))
@@ -207,10 +195,12 @@ enum StableRagdollPhysics {
             orientation: hingeOrientation
         )
 
-        var joint = PhysicsRevoluteJoint(pin0: parentPin, pin1: childPin)
-
-        // Add angle limits
-        joint.limits = (minAngle, maxAngle)
+        // Create revolute joint with angle limits
+        var joint = PhysicsRevoluteJoint(
+            pin0: parentPin,
+            pin1: childPin,
+            angularLimit: minAngle...maxAngle
+        )
 
         try joint.addToSimulation()
     }

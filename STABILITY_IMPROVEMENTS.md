@@ -4,17 +4,19 @@
 
 Based on your physics first-principles analysis, here are the critical issues and their fixes:
 
+> **Note**: Some advanced physics features like CCD, sleep thresholds, and angular velocity limits are not available in RealityKit's current API. We're compensating with other proven techniques.
+
 ### 1. 🔴 CRITICAL: Penetration/Collision Issues
 
 **Problem:**
 - Colliders at 87-90% of visual size still cause overlap
-- No Continuous Collision Detection (CCD) = tunneling through geometry
+- No Continuous Collision Detection available in RealityKit
 - Bodies can phase through each other and explode when physics corrects
 
 **Solution:**
-✅ Reduce collider size to **70% of visual** (vs current 87-90%)
-✅ **Enable CCD on all dynamic bodies** (`isCCDEnabled = true`)
+✅ Reduce collider size to **70% of visual** (vs current 87-90%) - **CRITICAL FIX**
 ✅ Increase spawn spacing to **1.6-1.8x** (vs current 1.3-1.5x)
+⚠️ CCD not available in RealityKit - using smaller colliders as compensation
 
 ### 2. 🔴 CRITICAL: Mass Ratio Problems
 
@@ -49,7 +51,8 @@ Ratio:      2.6:1 to 3.0:1  ✅ STABLE
 ### 4. 🟡 HIGH: No Sleep Thresholds
 
 **Problem**: Bodies never rest, micro-jitter accumulates into chaos
-**Solution**: Add sleep threshold = **0.01** for both linear and angular
+**Solution**: ⚠️ Sleep thresholds not available in RealityKit
+**Compensation**: Use **very high damping** (18-24 angular, 12-16 linear) to dissipate energy quickly
 
 ### 5. 🟡 MEDIUM: Friction Too High
 
@@ -60,7 +63,8 @@ Ratio:      2.6:1 to 3.0:1  ✅ STABLE
 ### 6. 🟡 MEDIUM: No Angular Velocity Limits
 
 **Problem**: Limbs can spin infinitely fast, creating huge destabilizing momentum
-**Solution**: Cap at **20 rad/s** (~3 rotations per second)
+**Solution**: ⚠️ Angular velocity limits not available in RealityKit
+**Compensation**: Use **very high angular damping** (18-24) to prevent runaway spinning
 
 ### 7. 🟢 LOW: Damping Values
 
@@ -78,30 +82,32 @@ Ratio:      2.6:1 to 3.0:1  ✅ STABLE
 
 ## Implementation Priority
 
-1. **IMMEDIATE** (Apply First):
-   - Enable CCD on all dynamic bodies
-   - Update mass ratios (reduce torso, increase limbs)
-   - Reduce collider sizes to 70%
+1. **IMMEDIATE** (Apply First) - ✅ DONE:
+   - ✅ Update mass ratios (reduce torso, increase limbs) - **MOST CRITICAL**
+   - ✅ Reduce collider sizes to 70% - **MOST CRITICAL**
+   - ⚠️ CCD not available - compensating with smaller colliders
 
-2. **HIGH** (Apply Second):
-   - Increase solver iterations to 150
-   - Add sleep thresholds (0.01)
-   - Reduce friction (0.5/0.4)
+2. **HIGH** (Apply Second) - ✅ DONE:
+   - ✅ Increase solver iterations to 150
+   - ✅ Reduce friction (0.5/0.4)
+   - ✅ Significantly increase damping (replaces sleep thresholds)
+   - ⚠️ Sleep thresholds not available - using high damping instead
 
-3. **MEDIUM** (Fine-tuning):
-   - Add max angular velocity (20 rad/s)
-   - Increase damping values
-   - Reduce gravity and restitution
+3. **MEDIUM** (Fine-tuning) - ✅ DONE:
+   - ✅ Very high damping (replaces angular velocity limits)
+   - ✅ Reduce gravity and eliminate restitution
+   - ⚠️ Angular velocity limits not available - using high damping instead
 
 ## Code Changes Required
 
 ### File: `StableRagdollPhysics.swift` (NEW)
 Created comprehensive stability module with:
-- CCD enabled by default
-- Mass normalization (enforces 3:1 max ratio)
-- Sleep thresholds
-- Max angular velocity limits
-- Helper methods for collider sizing
+- Mass normalization (enforces 3:1 max ratio) - **CRITICAL**
+- Reduced friction (0.5/0.4) for smoother behavior
+- Zero restitution (no bounce)
+- Very high damping to compensate for missing features
+- Helper methods for collider sizing (70%)
+- Note: CCD, sleep thresholds, and angular velocity limits not available in RealityKit
 
 ### File: `CharacterConfiguration.swift` (UPDATE)
 Need to update all 4 character presets with new mass values and physics properties.
@@ -123,12 +129,14 @@ Update defaults:
 
 ## Expected Results
 
-✅ **Dramatically reduced "explosions"** - CCD prevents tunneling
-✅ **Smoother motion** - Better mass ratios and friction
-✅ **Bodies can rest** - Sleep thresholds stop micro-jitter
-✅ **No crazy spinning** - Angular velocity limits
-✅ **Faster stabilization** - Higher solver iterations
-✅ **More predictable** - Lower gravity, no bounce
+✅ **Dramatically reduced "explosions"** - 70% colliders prevent overlap (most critical fix)
+✅ **Much smoother motion** - Normalized mass ratios (3:1 max) and lower friction
+✅ **Faster energy dissipation** - Very high damping compensates for missing sleep thresholds
+✅ **Reduced spinning chaos** - High angular damping compensates for missing velocity limits
+✅ **Faster stabilization** - 150 solver iterations (up from 80)
+✅ **More predictable** - Lower gravity (-4.0), no bounce (0.0 restitution)
+
+**Key Achievement**: Mass normalization + 70% collider sizing should eliminate most explosive behavior
 
 ## Testing Plan
 
