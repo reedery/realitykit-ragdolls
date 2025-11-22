@@ -7,17 +7,19 @@
 
 import SwiftUI
 import RealityKit
+import Combine
 
 /// ViewModel for managing ragdoll state and interactions
-@MainActor
 class RagdollViewModel: ObservableObject {
     @Published var torsoEntity: Entity?
     @Published var isDragging = false
+    @Published var ragdollScene: Entity?
 
     private var initialTorsoPosition: SIMD3<Float>?
 
     // MARK: - Drag Handling
 
+    @MainActor
     func onDragChanged(value: DragGesture.Value, in entity: Entity?) {
         guard let torso = torsoEntity, entity?.name == "torso" else { return }
 
@@ -41,6 +43,7 @@ class RagdollViewModel: ObservableObject {
         }
     }
 
+    @MainActor
     func onDragEnded() {
         isDragging = false
         initialTorsoPosition = nil
@@ -48,17 +51,16 @@ class RagdollViewModel: ObservableObject {
 
     // MARK: - Scene Setup
 
-    func setupRagdoll(in content: RealityViewContent) {
-        do {
-            let ragdollScene = try RagdollBuilder.buildRagdollScene()
-            content.add(ragdollScene)
+    @MainActor
+    func setupRagdoll() throws -> Entity {
+        let scene = try RagdollBuilder.buildRagdollScene()
+        ragdollScene = scene
 
-            // Find and store the torso entity reference
-            if let torso = ragdollScene.findEntity(named: "torso") {
-                torsoEntity = torso
-            }
-        } catch {
-            print("Error building ragdoll scene: \(error)")
+        // Find and store the torso entity reference
+        if let torso = scene.findEntity(named: "torso") {
+            torsoEntity = torso
         }
+
+        return scene
     }
 }

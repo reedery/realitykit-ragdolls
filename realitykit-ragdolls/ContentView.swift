@@ -14,7 +14,12 @@ struct ContentView: View {
     var body: some View {
         ZStack {
             RealityView { content in
-                viewModel.setupRagdoll(in: content)
+                do {
+                    let scene = try viewModel.setupRagdoll()
+                    content.add(scene)
+                } catch {
+                    print("Error setting up ragdoll: \(error)")
+                }
             }
             .gesture(
                 DragGesture()
