@@ -11,18 +11,18 @@ import SwiftUI
 /// Observable physics configuration for live editing
 @Observable
 class PhysicsConfiguration {
-    var gravity: Float = -6.0
-    var positionIterations: Int = 80
-    var velocityIterations: Int = 80
+    var gravity: Float = -4.0
+    var positionIterations: Int = 150
+    var velocityIterations: Int = 150
 
-    var angularDamping: Float = 12.0
-    var linearDamping: Float = 8.0
-    var extremityAngularDamping: Float = 15.0
-    var extremityLinearDamping: Float = 10.0
+    var angularDamping: Float = 18.0
+    var linearDamping: Float = 12.0
+    var extremityAngularDamping: Float = 22.0
+    var extremityLinearDamping: Float = 15.0
 
-    var staticFriction: Float = 0.9
-    var dynamicFriction: Float = 0.8
-    var restitution: Float = 0.01
+    var staticFriction: Float = 0.5
+    var dynamicFriction: Float = 0.4
+    var restitution: Float = 0.0
 
     var shoulderConeLimitDegrees: Float = 45
     var hipConeLimitDegrees: Float = 30

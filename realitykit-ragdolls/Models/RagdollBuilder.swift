@@ -573,82 +573,86 @@ extension RagdollBuilder {
         let props = character.bodyProportions
         let physics = character.physicsProperties
 
-        // Torso - kinematic (slightly smaller collider than visual)
-        RagdollPhysics.addKinematicPhysics(
+        // Torso - kinematic (70% of visual size for stability)
+        StableRagdollPhysics.addKinematicPhysics(
             to: torso,
-            shape: .generateSphere(radius: props.torsoRadius * 0.9),
+            shape: .generateSphere(radius: props.torsoRadius * 0.70),
             mass: physics.torsoMass,
             config: physicsConfig
         )
 
-        // Head - dynamic (slightly smaller collider)
-        RagdollPhysics.addDynamicPhysics(
+        // Head - dynamic (70% of visual size)
+        StableRagdollPhysics.addDynamicPhysics(
             to: head,
-            shape: .generateSphere(radius: props.headRadius * 0.87),
+            shape: .generateSphere(radius: props.headRadius * 0.70),
             mass: physics.headMass,
             config: physicsConfig,
             isExtremity: true
         )
 
-        // Arms - capsules for smoother collisions
-        let upperArmCapsuleHeight = props.upperArmLength * 0.87
-        let lowerArmCapsuleHeight = props.lowerArmLength * 0.87
+        // Arms - capsules for smoother collisions (70% sizing)
+        let upperArmCapsuleHeight = props.upperArmLength * 0.70
+        let upperArmCapsuleRadius = props.upperArmRadius * 0.70
+        let lowerArmCapsuleHeight = props.lowerArmLength * 0.70
+        let lowerArmCapsuleRadius = props.lowerArmRadius * 0.70
 
-        RagdollPhysics.addDynamicPhysics(
+        StableRagdollPhysics.addDynamicPhysics(
             to: leftUpperArm,
-            shape: .generateCapsule(height: upperArmCapsuleHeight, radius: props.upperArmRadius),
+            shape: .generateCapsule(height: upperArmCapsuleHeight, radius: upperArmCapsuleRadius),
             mass: physics.upperArmMass,
             config: physicsConfig
         )
-        RagdollPhysics.addDynamicPhysics(
+        StableRagdollPhysics.addDynamicPhysics(
             to: rightUpperArm,
-            shape: .generateCapsule(height: upperArmCapsuleHeight, radius: props.upperArmRadius),
+            shape: .generateCapsule(height: upperArmCapsuleHeight, radius: upperArmCapsuleRadius),
             mass: physics.upperArmMass,
             config: physicsConfig
         )
 
-        RagdollPhysics.addDynamicPhysics(
+        StableRagdollPhysics.addDynamicPhysics(
             to: leftLowerArm,
-            shape: .generateCapsule(height: lowerArmCapsuleHeight, radius: props.lowerArmRadius),
+            shape: .generateCapsule(height: lowerArmCapsuleHeight, radius: lowerArmCapsuleRadius),
             mass: physics.lowerArmMass,
             config: physicsConfig,
             isExtremity: true
         )
-        RagdollPhysics.addDynamicPhysics(
+        StableRagdollPhysics.addDynamicPhysics(
             to: rightLowerArm,
-            shape: .generateCapsule(height: lowerArmCapsuleHeight, radius: props.lowerArmRadius),
+            shape: .generateCapsule(height: lowerArmCapsuleHeight, radius: lowerArmCapsuleRadius),
             mass: physics.lowerArmMass,
             config: physicsConfig,
             isExtremity: true
         )
 
-        // Legs - capsules for smoother collisions
-        let upperLegCapsuleHeight = props.upperLegLength * 0.87
-        let lowerLegCapsuleHeight = props.lowerLegLength * 0.87
+        // Legs - capsules for smoother collisions (70% sizing)
+        let upperLegCapsuleHeight = props.upperLegLength * 0.70
+        let upperLegCapsuleRadius = props.upperLegRadius * 0.70
+        let lowerLegCapsuleHeight = props.lowerLegLength * 0.70
+        let lowerLegCapsuleRadius = props.lowerLegRadius * 0.70
 
-        RagdollPhysics.addDynamicPhysics(
+        StableRagdollPhysics.addDynamicPhysics(
             to: leftUpperLeg,
-            shape: .generateCapsule(height: upperLegCapsuleHeight, radius: props.upperLegRadius),
+            shape: .generateCapsule(height: upperLegCapsuleHeight, radius: upperLegCapsuleRadius),
             mass: physics.upperLegMass,
             config: physicsConfig
         )
-        RagdollPhysics.addDynamicPhysics(
+        StableRagdollPhysics.addDynamicPhysics(
             to: rightUpperLeg,
-            shape: .generateCapsule(height: upperLegCapsuleHeight, radius: props.upperLegRadius),
+            shape: .generateCapsule(height: upperLegCapsuleHeight, radius: upperLegCapsuleRadius),
             mass: physics.upperLegMass,
             config: physicsConfig
         )
 
-        RagdollPhysics.addDynamicPhysics(
+        StableRagdollPhysics.addDynamicPhysics(
             to: leftLowerLeg,
-            shape: .generateCapsule(height: lowerLegCapsuleHeight, radius: props.lowerLegRadius),
+            shape: .generateCapsule(height: lowerLegCapsuleHeight, radius: lowerLegCapsuleRadius),
             mass: physics.lowerLegMass,
             config: physicsConfig,
             isExtremity: true
         )
-        RagdollPhysics.addDynamicPhysics(
+        StableRagdollPhysics.addDynamicPhysics(
             to: rightLowerLeg,
-            shape: .generateCapsule(height: lowerLegCapsuleHeight, radius: props.lowerLegRadius),
+            shape: .generateCapsule(height: lowerLegCapsuleHeight, radius: lowerLegCapsuleRadius),
             mass: physics.lowerLegMass,
             config: physicsConfig,
             isExtremity: true
@@ -674,14 +678,14 @@ extension RagdollBuilder {
         let props = character.bodyProportions
         let physics = character.physicsProperties
 
-        // Calculate joint offsets
-        let torsoTop = props.torsoRadius * 0.9
-        let torsoBottom = -props.torsoRadius * 0.9
-        let torsoShoulder = props.torsoRadius * 0.9
-        let headBottom = -props.headRadius * 0.87
+        // Calculate joint offsets (70% sizing to match colliders)
+        let torsoTop = props.torsoRadius * 0.70
+        let torsoBottom = -props.torsoRadius * 0.70
+        let torsoShoulder = props.torsoRadius * 0.70
+        let headBottom = -props.headRadius * 0.70
 
         // Neck joint
-        try RagdollPhysics.createSphericalJoint(
+        try StableRagdollPhysics.createSphericalJoint(
             parent: torso,
             parentOffset: [0, torsoTop, 0],
             child: head,
@@ -691,9 +695,9 @@ extension RagdollBuilder {
 
         // Shoulders
         let shoulderHorizontalOffset = torsoShoulder
-        let armTopOffset = props.upperArmLength * 0.87 / 2
+        let armTopOffset = props.upperArmLength * 0.70 / 2
 
-        try RagdollPhysics.createSphericalJoint(
+        try StableRagdollPhysics.createSphericalJoint(
             parent: torso,
             parentOffset: [-shoulderHorizontalOffset, torsoTop * 0.5, 0],
             child: leftUpperArm,
@@ -701,7 +705,7 @@ extension RagdollBuilder {
             coneLimitRadians: physicsConfig.shoulderConeLimitDegrees * .pi / 180
         )
 
-        try RagdollPhysics.createSphericalJoint(
+        try StableRagdollPhysics.createSphericalJoint(
             parent: torso,
             parentOffset: [shoulderHorizontalOffset, torsoTop * 0.5, 0],
             child: rightUpperArm,
@@ -710,10 +714,10 @@ extension RagdollBuilder {
         )
 
         // Elbows
-        let armBottomOffset = -props.upperArmLength * 0.87 / 2
-        let forearmTopOffset = props.lowerArmLength * 0.87 / 2
+        let armBottomOffset = -props.upperArmLength * 0.70 / 2
+        let forearmTopOffset = props.lowerArmLength * 0.70 / 2
 
-        try RagdollPhysics.createRevoluteJoint(
+        try StableRagdollPhysics.createRevoluteJoint(
             parent: leftUpperArm,
             parentOffset: [armBottomOffset, 0, 0],
             child: leftLowerArm,
@@ -723,7 +727,7 @@ extension RagdollBuilder {
             maxAngle: physicsConfig.elbowMaxBendDegrees * .pi / 180
         )
 
-        try RagdollPhysics.createRevoluteJoint(
+        try StableRagdollPhysics.createRevoluteJoint(
             parent: rightUpperArm,
             parentOffset: [-armBottomOffset, 0, 0],
             child: rightLowerArm,
@@ -735,9 +739,9 @@ extension RagdollBuilder {
 
         // Hips
         let hipHorizontalOffset = props.torsoRadius * 0.6
-        let legTopOffset = props.upperLegLength * 0.87 / 2
+        let legTopOffset = props.upperLegLength * 0.70 / 2
 
-        try RagdollPhysics.createSphericalJoint(
+        try StableRagdollPhysics.createSphericalJoint(
             parent: torso,
             parentOffset: [-hipHorizontalOffset, torsoBottom, 0],
             child: leftUpperLeg,
@@ -745,7 +749,7 @@ extension RagdollBuilder {
             coneLimitRadians: physicsConfig.hipConeLimitDegrees * .pi / 180
         )
 
-        try RagdollPhysics.createSphericalJoint(
+        try StableRagdollPhysics.createSphericalJoint(
             parent: torso,
             parentOffset: [hipHorizontalOffset, torsoBottom, 0],
             child: rightUpperLeg,
@@ -754,10 +758,10 @@ extension RagdollBuilder {
         )
 
         // Knees
-        let legBottomOffset = -props.upperLegLength * 0.87 / 2
-        let shinTopOffset = props.lowerLegLength * 0.87 / 2
+        let legBottomOffset = -props.upperLegLength * 0.70 / 2
+        let shinTopOffset = props.lowerLegLength * 0.70 / 2
 
-        try RagdollPhysics.createRevoluteJoint(
+        try StableRagdollPhysics.createRevoluteJoint(
             parent: leftUpperLeg,
             parentOffset: [0, legBottomOffset, 0],
             child: leftLowerLeg,
@@ -767,7 +771,7 @@ extension RagdollBuilder {
             maxAngle: 0
         )
 
-        try RagdollPhysics.createRevoluteJoint(
+        try StableRagdollPhysics.createRevoluteJoint(
             parent: rightUpperLeg,
             parentOffset: [0, legBottomOffset, 0],
             child: rightLowerLeg,
