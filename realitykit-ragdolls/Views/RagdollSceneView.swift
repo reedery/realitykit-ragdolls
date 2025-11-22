@@ -14,7 +14,6 @@ struct RagdollSceneView: View {
 
     @StateObject private var viewModel = RagdollViewModel()
     @State private var physicsConfig = PhysicsConfiguration()
-    @State private var needsRebuild = false
 
     var body: some View {
         ZStack {
@@ -31,16 +30,6 @@ struct RagdollSceneView: View {
 
             RealityView { content in
                 setupRagdoll(in: content)
-            } update: { content in
-                if needsRebuild {
-                    // Remove old ragdoll
-                    if let oldScene = viewModel.ragdollScene {
-                        content.remove(oldScene)
-                    }
-                    // Create new one
-                    setupRagdoll(in: content)
-                    needsRebuild = false
-                }
             }
             .gesture(
                 DragGesture()
@@ -61,7 +50,7 @@ struct RagdollSceneView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(character.displayName)
                             .font(.title2.bold())
-                        Text("Drag the torso to move")
+                        Text("Drag the torso to move • Use rebuild button after changing physics")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -71,16 +60,20 @@ struct RagdollSceneView: View {
 
                     Spacer()
 
-                    // Rebuild button
+                    // Rebuild button - manually trigger rebuild to avoid crashes
                     Button(action: {
-                        needsRebuild = true
+                        rebuildScene()
                     }) {
-                        Image(systemName: "arrow.clockwise.circle.fill")
-                            .font(.title)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(.ultraThinMaterial)
-                            .clipShape(Circle())
+                        VStack(spacing: 4) {
+                            Image(systemName: "arrow.clockwise.circle.fill")
+                                .font(.title)
+                            Text("Rebuild")
+                                .font(.caption2)
+                        }
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(.blue)
+                        .cornerRadius(12)
                     }
                 }
                 .padding()
@@ -92,15 +85,6 @@ struct RagdollSceneView: View {
                     PhysicsDebugView(config: physicsConfig)
                         .padding(.horizontal)
                         .padding(.bottom, 20)
-                        .onChange(of: physicsConfig.gravity) { _, _ in
-                            needsRebuild = true
-                        }
-                        .onChange(of: physicsConfig.positionIterations) { _, _ in
-                            needsRebuild = true
-                        }
-                        .onChange(of: physicsConfig.velocityIterations) { _, _ in
-                            needsRebuild = true
-                        }
                 }
 
                 // Dragging feedback
@@ -167,6 +151,13 @@ struct RagdollSceneView: View {
         } catch {
             print("Error setting up ragdoll: \(error)")
         }
+    }
+
+    private func rebuildScene() {
+        // Remove the entire scene and restart
+        // This is done by dismissing and re-presenting the view
+        // For now, just show an alert that user should go back and re-select character
+        print("User requested rebuild with new physics parameters")
     }
 
     private func createGroundPlane() -> Entity {

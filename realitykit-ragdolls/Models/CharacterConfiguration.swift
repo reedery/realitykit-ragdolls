@@ -111,7 +111,7 @@ extension CharacterConfiguration {
             upperLegRadius: 0.04,
             lowerLegLength: 0.3,
             lowerLegRadius: 0.036,
-            jointSpacing: 1.0
+            jointSpacing: 1.4
         ),
         physicsProperties: PhysicsProperties(
             torsoMass: 8.0,
@@ -157,7 +157,7 @@ extension CharacterConfiguration {
             upperLegRadius: 0.035,
             lowerLegLength: 0.4,
             lowerLegRadius: 0.032,
-            jointSpacing: 1.1
+            jointSpacing: 1.5
         ),
         physicsProperties: PhysicsProperties(
             torsoMass: 7.0,
@@ -203,7 +203,7 @@ extension CharacterConfiguration {
             upperLegRadius: 0.045,
             lowerLegLength: 0.25,
             lowerLegRadius: 0.042,
-            jointSpacing: 0.9
+            jointSpacing: 1.3
         ),
         physicsProperties: PhysicsProperties(
             torsoMass: 9.0,
@@ -249,7 +249,7 @@ extension CharacterConfiguration {
             upperLegRadius: 0.05,
             lowerLegLength: 0.3,
             lowerLegRadius: 0.046,
-            jointSpacing: 1.0
+            jointSpacing: 1.4
         ),
         physicsProperties: PhysicsProperties(
             torsoMass: 10.0,

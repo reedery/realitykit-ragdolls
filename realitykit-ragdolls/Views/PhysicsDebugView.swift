@@ -213,19 +213,24 @@ struct DebugSlider: View {
     let unit: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(title)
-                    .font(.subheadline)
+                    .font(.body.weight(.medium))
                 Spacer()
                 Text(String(format: "%.1f\(unit)", value))
-                    .font(.subheadline.monospacedDigit())
-                    .foregroundColor(.secondary)
+                    .font(.body.weight(.bold).monospacedDigit())
+                    .foregroundColor(.blue)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color.blue.opacity(0.1))
+                    .cornerRadius(6)
             }
 
             Slider(value: $value, in: range, step: step)
                 .tint(.blue)
         }
+        .padding(.vertical, 4)
     }
 }
 

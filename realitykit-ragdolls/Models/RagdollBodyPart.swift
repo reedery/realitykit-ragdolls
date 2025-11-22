@@ -139,8 +139,20 @@ extension RagdollBodyPart {
         let entity = Entity()
         entity.name = name
 
-        // Use box for visual representation (capsule for physics)
-        let mesh = MeshResource.generateBox(size: [length, radius * 2, radius * 2])
+        // Determine orientation based on limb type
+        // Legs should be vertical, arms should be horizontal
+        let isLeg = name.contains("leg")
+        let size: SIMD3<Float>
+
+        if isLeg {
+            // Vertical orientation for legs: [width, height, depth]
+            size = [radius * 2, length, radius * 2]
+        } else {
+            // Horizontal orientation for arms: [length, height, depth]
+            size = [length, radius * 2, radius * 2]
+        }
+
+        let mesh = MeshResource.generateBox(size: size)
         var material = PhysicallyBasedMaterial()
         material.baseColor.tint = color
         material.roughness = 0.7
