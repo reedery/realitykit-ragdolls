@@ -35,16 +35,6 @@
 			path = "realitykit-ragdolls";
 			sourceTree = "<group>";
 		};
-		904790792ED1BFDC002ACDCC /* realitykit-ragdollsTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "realitykit-ragdollsTests";
-			sourceTree = "<group>";
-		};
-		904790832ED1BFDC002ACDCC /* realitykit-ragdollsUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "realitykit-ragdollsUITests";
-			sourceTree = "<group>";
-		};
 		904790A22ED1C16B002ACDCC /* Assets3d */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Assets3d;
@@ -82,8 +72,6 @@
 			children = (
 				904790A22ED1C16B002ACDCC /* Assets3d */,
 				9047906B2ED1BFDB002ACDCC /* realitykit-ragdolls */,
-				904790792ED1BFDC002ACDCC /* realitykit-ragdollsTests */,
-				904790832ED1BFDC002ACDCC /* realitykit-ragdollsUITests */,
 				9047906A2ED1BFDB002ACDCC /* Products */,
 			);
 			sourceTree = "<group>";
@@ -137,9 +125,6 @@
 			dependencies = (
 				904790782ED1BFDC002ACDCC /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				904790792ED1BFDC002ACDCC /* realitykit-ragdollsTests */,
-			);
 			name = "realitykit-ragdollsTests";
 			packageProductDependencies = (
 			);
@@ -159,9 +144,6 @@
 			);
 			dependencies = (
 				904790822ED1BFDC002ACDCC /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				904790832ED1BFDC002ACDCC /* realitykit-ragdollsUITests */,
 			);
 			name = "realitykit-ragdollsUITests";
 			packageProductDependencies = (

@@ -6,6 +6,7 @@
 //
 
 import RealityKit
+import UIKit
 
 /// Factory for creating ragdoll body part entities
 struct RagdollBodyPart {
@@ -16,7 +17,7 @@ struct RagdollBodyPart {
         let entity = Entity()
         entity.name = "torso"
 
-        let mesh = MeshResource.generateBox(size: [0.3, 0.5, 0.15])
+        let mesh = MeshResource.generateSphere(radius: 0.2)
         var material = PhysicallyBasedMaterial()
         material.baseColor.tint = .blue
         entity.components.set(ModelComponent(mesh: mesh, materials: [material]))
@@ -28,7 +29,7 @@ struct RagdollBodyPart {
         let entity = Entity()
         entity.name = "head"
 
-        let mesh = MeshResource.generateSphere(radius: 0.1)
+        let mesh = MeshResource.generateSphere(radius: 0.15)
         var material = PhysicallyBasedMaterial()
         material.baseColor.tint = .orange
         entity.components.set(ModelComponent(mesh: mesh, materials: [material]))
@@ -40,9 +41,10 @@ struct RagdollBodyPart {
         let entity = Entity()
         entity.name = "upper_arm"
 
-        let mesh = MeshResource.generateBox(size: [0.2, 0.08, 0.08])
+        // Longer arms for better stability (0.3 instead of 0.2)
+        let mesh = MeshResource.generateBox(size: [0.3, 0.08, 0.08])
         var material = PhysicallyBasedMaterial()
-        material.baseColor.tint = .green
+        material.baseColor.tint = .orange
         entity.components.set(ModelComponent(mesh: mesh, materials: [material]))
 
         return entity
@@ -52,9 +54,10 @@ struct RagdollBodyPart {
         let entity = Entity()
         entity.name = "lower_arm"
 
-        let mesh = MeshResource.generateBox(size: [0.2, 0.07, 0.07])
+        // Longer arms for better stability (0.3 instead of 0.2)
+        let mesh = MeshResource.generateBox(size: [0.3, 0.07, 0.07])
         var material = PhysicallyBasedMaterial()
-        material.baseColor.tint = .cyan
+        material.baseColor.tint = .orange
         entity.components.set(ModelComponent(mesh: mesh, materials: [material]))
 
         return entity
@@ -66,7 +69,7 @@ struct RagdollBodyPart {
 
         let mesh = MeshResource.generateBox(size: [0.1, 0.3, 0.1])
         var material = PhysicallyBasedMaterial()
-        material.baseColor.tint = .yellow
+        material.baseColor.tint = .orange
         entity.components.set(ModelComponent(mesh: mesh, materials: [material]))
 
         return entity
@@ -78,7 +81,7 @@ struct RagdollBodyPart {
 
         let mesh = MeshResource.generateBox(size: [0.09, 0.3, 0.09])
         var material = PhysicallyBasedMaterial()
-        material.baseColor.tint = .purple
+        material.baseColor.tint = .orange
         entity.components.set(ModelComponent(mesh: mesh, materials: [material]))
 
         return entity

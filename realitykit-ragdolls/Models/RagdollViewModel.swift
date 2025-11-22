@@ -10,6 +10,7 @@ import RealityKit
 import Combine
 
 /// ViewModel for managing ragdoll state and interactions
+@MainActor
 class RagdollViewModel: ObservableObject {
     @Published var torsoEntity: Entity?
     @Published var isDragging = false
@@ -19,7 +20,6 @@ class RagdollViewModel: ObservableObject {
 
     // MARK: - Drag Handling
 
-    @MainActor
     func onDragChanged(value: DragGesture.Value, in entity: Entity?) {
         guard let torso = torsoEntity, entity?.name == "torso" else { return }
 
@@ -31,7 +31,7 @@ class RagdollViewModel: ObservableObject {
 
         // Convert drag translation to 3D movement
         // Scale factor to make dragging feel natural
-        let scale: Float = 0.001
+        let scale: Float = 0.005
         let translation = SIMD3<Float>(
             Float(value.translation.width) * scale,
             -Float(value.translation.height) * scale,
@@ -43,7 +43,6 @@ class RagdollViewModel: ObservableObject {
         }
     }
 
-    @MainActor
     func onDragEnded() {
         isDragging = false
         initialTorsoPosition = nil
@@ -51,7 +50,6 @@ class RagdollViewModel: ObservableObject {
 
     // MARK: - Scene Setup
 
-    @MainActor
     func setupRagdoll() throws -> Entity {
         let scene = try RagdollBuilder.buildRagdollScene()
         ragdollScene = scene
