@@ -12,8 +12,8 @@ import SwiftUI
 @Observable
 class PhysicsConfiguration {
     var gravity: Float = -6.0
-    var positionIterations: UInt32 = 80
-    var velocityIterations: UInt32 = 80
+    var positionIterations: Int = 80
+    var velocityIterations: Int = 80
 
     var angularDamping: Float = 12.0
     var linearDamping: Float = 8.0

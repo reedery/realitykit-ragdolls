@@ -7,6 +7,7 @@
 
 import Foundation
 import RealityKit
+import UIKit
 
 /// Configuration for a ragdoll character loaded from JSON
 struct CharacterConfiguration: Codable, Identifiable {

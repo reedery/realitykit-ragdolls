@@ -123,7 +123,7 @@ struct RagdollSceneView: View {
 
     // MARK: - Setup
 
-    private func setupRagdoll(in content: RealityViewContent) {
+    private func setupRagdoll(in content: some RealityViewContentProtocol) {
         do {
             // Create physics world
             let physicsWorld = Entity()
@@ -203,7 +203,7 @@ struct RagdollSceneView: View {
         return ground
     }
 
-    private func addLighting(to content: RealityViewContent) {
+    private func addLighting(to content: some RealityViewContentProtocol) {
         // Directional light (sun)
         let sunlight = DirectionalLight()
         sunlight.light.intensity = 2000
