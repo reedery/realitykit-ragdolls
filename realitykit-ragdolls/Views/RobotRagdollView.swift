@@ -7,6 +7,7 @@
 
 import SwiftUI
 import RealityKit
+import Combine
 
 struct RobotRagdollView: View {
     @StateObject private var viewModel = RobotRagdollViewModel()

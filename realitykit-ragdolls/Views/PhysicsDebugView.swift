@@ -53,7 +53,7 @@ struct PhysicsDebugView: View {
                                 title: "Position",
                                 value: Binding(
                                     get: { Float(config.positionIterations) },
-                                    set: { config.positionIterations = UInt32($0) }
+                                    set: { config.positionIterations = Int($0) }
                                 ),
                                 range: 10...200,
                                 step: 10,
@@ -64,7 +64,7 @@ struct PhysicsDebugView: View {
                                 title: "Velocity",
                                 value: Binding(
                                     get: { Float(config.velocityIterations) },
-                                    set: { config.velocityIterations = UInt32($0) }
+                                    set: { config.velocityIterations = Int($0) }
                                 ),
                                 range: 10...200,
                                 step: 10,
