@@ -11,6 +11,7 @@ struct HomeView: View {
     @State private var selectedCharacter: CharacterConfiguration?
     @State private var showPhysicsDebug = false
     @State private var navigateToRagdoll = false
+    @State private var navigateToRobot = false
 
     let characters = CharacterConfiguration.loadPresets()
 
@@ -34,6 +35,36 @@ struct HomeView: View {
                         .font(.system(size: 44, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
                         .padding(.top, 50)
+
+                    // Robot Ragdoll Button
+                    Button(action: {
+                        navigateToRobot = true
+                    }) {
+                        HStack {
+                            Image(systemName: "figure.walk.motion")
+                                .font(.title2)
+                            Text("Robot Ragdoll Demo")
+                                .font(.title3.bold())
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color.green, Color.blue]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .cornerRadius(15)
+                        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
+                    }
+                    .padding(.horizontal, 40)
+
+                    Divider()
+                        .background(Color.white.opacity(0.3))
+                        .padding(.horizontal, 40)
+                        .padding(.vertical, 10)
 
                     Text("Select a Character")
                         .font(.title2)
@@ -98,6 +129,10 @@ struct HomeView: View {
                     )
                     .navigationBarBackButtonHidden(false)
                 }
+            }
+            .navigationDestination(isPresented: $navigateToRobot) {
+                RobotRagdollView()
+                    .navigationBarBackButtonHidden(false)
             }
         }
     }
