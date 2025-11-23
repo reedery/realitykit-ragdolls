@@ -19,6 +19,12 @@ Defines the data structures for the application.
 - `SkeletalPose`: Collection of joints representing a skeleton pose
 - `SkeletonInfo`: Complete skeleton information including entity name, poses, and joint names
 
+#### `JointMarkerComponent.swift`
+
+- Custom RealityKit component for storing joint metadata on marker entities
+- Properties: `jointIndex`, `jointName`, `isDraggable`
+- Enables identification of joint markers during gesture handling
+
 ### Services
 
 Business logic and utilities.
@@ -38,6 +44,40 @@ Manages skeleton extraction and manipulation for USDZ models.
 - Automatically discovers `SkeletalPosesComponent` in entity hierarchy
 - Extracts joint names and transforms
 - Provides structured skeleton data for ragdoll physics implementation
+
+#### `ArticulationManager.swift`
+
+Manages skeleton articulation and joint manipulation for interactive control.
+
+**Public Methods:**
+
+- `setupArticulation(for:skeletonInfo:configs:)` - Configures joints for articulation
+- `identifyArticulationJoints(from:)` - Automatically identifies key joints (hands, elbows, shoulders)
+- `handleJointDrag(jointIndex:translation:)` - Handles drag gestures on joints
+
+**Features:**
+
+- Creates visual markers for draggable joints
+- Supports joint rotation constraints (min/max angles)
+- Enables interactive manipulation of skeleton
+- Automatically identifies hands, elbows, and shoulders by name patterns
+
+#### `GestureManager.swift`
+
+Manages gesture interactions for articulated joints.
+
+**Public Methods:**
+
+- `setupGestures(for:)` - Prepares gesture recognition
+- `handleDragBegan(entity:at:)` - Handles drag start
+- `handleDragChanged(entity:translation:)` - Updates joint during drag
+- `handleDragEnded(entity:)` - Handles drag completion
+
+**Features:**
+
+- Tracks drag state for joint markers
+- Coordinates with `ArticulationManager` for joint updates
+- Smooth gesture-based joint manipulation
 
 ### ViewModels
 
@@ -63,6 +103,13 @@ Manages RealityKit scene and USDZ model loading.
 - `createGroundPlane()` - Creates physics-enabled ground
 - `setupLighting(in:)` - Professional 3-point lighting
 - `setCamera(in:position:)` - Camera setup
+- `setupArticulation(for:skeletonInfo:anchor:)` - Configures interactive articulation
+
+**Properties:**
+
+- `articulationManager` - Manages joint articulation
+- `gestureManager` - Handles gesture interactions
+- `rootAnchor` - Reference to scene root for gesture coordination
 
 ### Views
 
@@ -74,11 +121,13 @@ Main view with error handling and loading states.
 
 #### `RealitySceneView.swift`
 
-Minimal view that displays the RealityKit scene.
+Interactive view that displays the RealityKit scene with gesture handling.
 
 - Calls `viewModel.buildScene()`
 - Blue sky gradient background
 - Camera orbit controls
+- **Drag gesture handling** for joint markers
+- Coordinates with `GestureManager` for articulation
 
 ## Separation of Concerns
 
@@ -106,15 +155,42 @@ Purely presentational. Minimal logic, just displays what the ViewModel provides.
 4. **Maintainability**: Changes to skeleton logic don't affect ViewModel or Views
 5. **Scalability**: Easy to add new features (e.g., ragdoll physics, animation)
 
-## Next Steps for Ragdoll Physics
+## Interactive Articulation System
 
-With the skeleton data now properly extracted and structured:
+The application now features a complete interactive articulation system:
+
+### Current Features ✅
+
+1. **Automatic Joint Detection** - Identifies hands, elbows, and shoulders from skeleton
+2. **Visual Joint Markers** - Blue spheres mark draggable joints (hands)
+3. **Drag Gestures** - Click and drag joint markers to move them
+4. **Joint Constraints** - Configurable rotation limits per joint
+5. **Clean Architecture** - Separated concerns across services
+
+### How It Works
+
+1. `SkeletonManager` extracts skeleton from USDZ model
+2. `ArticulationManager.identifyArticulationJoints()` finds key joints (hands, elbows)
+3. Visual markers created for draggable joints
+4. `GestureManager` handles drag gestures on markers
+5. View coordinates gestures with managers
+
+### Making the Robot Wave
+
+The system automatically creates draggable markers on the robot's hands. Users can:
+
+- **Click and drag** hand markers to move them
+- **Orbit camera** to view from different angles
+- Joints respect configured rotation limits
+
+## Next Steps for Full Ragdoll Physics
+
+To implement full physics-based ragdoll:
 
 1. Create `RagdollPhysicsManager` service
-2. Use `SkeletonInfo` to identify joint pairs
-3. Create physics bodies for each bone segment
-4. Connect bodies with `PhysicsJointComponent` (hinges, ball-and-socket)
-5. Apply physics properties (mass, friction, damping)
-6. Implement joint limits for realistic movement
+2. Generate physics bodies for bone segments between joints
+3. Connect bodies with `PhysicsJointComponent` (hinges, ball-and-socket)
+4. Apply gravity and physics simulation
+5. Implement inverse kinematics for smooth motion
 
-The current architecture makes these steps straightforward and maintainable.
+The current architecture makes these enhancements straightforward and maintainable.
