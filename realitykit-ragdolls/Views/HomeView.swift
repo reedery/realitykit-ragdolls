@@ -43,7 +43,7 @@ struct HomeView: View {
                         HStack {
                             Image(systemName: "figure.walk.motion")
                                 .font(.title2)
-                            Text("Robot Ragdoll Demo")
+                            Text("Robot Model Demo") //not ragdoll
                                 .font(.title3.bold())
                         }
                         .foregroundColor(.white)
@@ -131,8 +131,8 @@ struct HomeView: View {
                 }
             }
             .navigationDestination(isPresented: $navigateToRobot) {
-                RobotRagdollView()
-                    .navigationBarBackButtonHidden(false)
+                //RobotRagdollView().navigationBarBackButtonHidden(false)
+                RobotModelView().navigationBarBackButtonHidden(false)
             }
         }
     }

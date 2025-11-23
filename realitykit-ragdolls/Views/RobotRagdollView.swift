@@ -28,16 +28,16 @@ struct RobotRagdollView: View {
             RealityView { content in
                 await viewModel.setupScene(in: content)
             }
-            .gesture(
-                DragGesture()
-                    .targetedToAnyEntity()
-                    .onChanged { value in
-                        viewModel.onDragChanged(value: value.gestureValue, in: value.entity)
-                    }
-                    .onEnded { _ in
-                        viewModel.onDragEnded()
-                    }
-            )
+//            .gesture(
+//                DragGesture()
+//                    .targetedToAnyEntity()
+//                    .onChanged { value in
+//                        viewModel.onDragChanged(value: value.gestureValue, in: value.entity)
+//                    }
+//                    .onEnded { _ in
+//                        viewModel.onDragEnded()
+//                    }
+//            )
             .realityViewCameraControls(.orbit)
 
             // UI Overlays
@@ -205,33 +205,33 @@ class RobotRagdollViewModel: ObservableObject {
 
     // MARK: - Drag Handling
 
-    func onDragChanged(value: DragGesture.Value, in entity: Entity?) {
-        guard let dragEntity = draggableEntity,
-              entity?.name == "chest" || entity?.name == "pelvis" else { return }
-
-        isDragging = true
-
-        if initialDragPosition == nil {
-            initialDragPosition = dragEntity.position
-        }
-
-        // Convert drag translation to 3D movement
-        let scale: Float = 0.005
-        let translation = SIMD3<Float>(
-            Float(value.translation.width) * scale,
-            -Float(value.translation.height) * scale,
-            0
-        )
-
-        if let initialPos = initialDragPosition {
-            dragEntity.position = initialPos + translation
-        }
-    }
-
-    func onDragEnded() {
-        isDragging = false
-        initialDragPosition = nil
-    }
+//    func onDragChanged(value: DragGesture.Value, in entity: Entity?) {
+//        guard let dragEntity = draggableEntity,
+//              entity?.name == "chest" || entity?.name == "pelvis" else { return }
+//
+//        isDragging = true
+//
+//        if initialDragPosition == nil {
+//            initialDragPosition = dragEntity.position
+//        }
+//
+//        // Convert drag translation to 3D movement
+//        let scale: Float = 0.005
+//        let translation = SIMD3<Float>(
+//            Float(value.translation.width) * scale,
+//            -Float(value.translation.height) * scale,
+//            0
+//        )
+//
+//        if let initialPos = initialDragPosition {
+//            dragEntity.position = initialPos + translation
+//        }
+//    }
+//
+//    func onDragEnded() {
+//        isDragging = false
+//        initialDragPosition = nil
+//    }
 }
 
 // MARK: - Preview

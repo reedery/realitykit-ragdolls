@@ -24,20 +24,15 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		904790692ED1BFDB002ACDCC /* realitykit-ragdolls.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "realitykit-ragdolls.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		904790762ED1BFDC002ACDCC /* realitykit-ragdollsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "realitykit-ragdollsTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		904790802ED1BFDC002ACDCC /* realitykit-ragdollsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "realitykit-ragdollsUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		904790762ED1BFDC002ACDCC /* realitykit-ragdollsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "realitykit-ragdollsTests.xctest"; path = "/Users/ryanreede/Documents/github/realitykit-ragdolls/build/Debug-iphoneos/realitykit-ragdolls.app/PlugIns/realitykit-ragdollsTests.xctest"; sourceTree = "<absolute>"; };
+		904790802ED1BFDC002ACDCC /* realitykit-ragdollsUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "realitykit-ragdollsUITests.xctest"; path = "/Users/ryanreede/Documents/github/realitykit-ragdolls/build/Debug-iphoneos/realitykit-ragdollsUITests-Runner.app/PlugIns/realitykit-ragdollsUITests.xctest"; sourceTree = "<absolute>"; };
+		908251252ED35FE70096DA1F /* realitykit-ragdolls.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "realitykit-ragdolls.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		9047906B2ED1BFDB002ACDCC /* realitykit-ragdolls */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "realitykit-ragdolls";
-			sourceTree = "<group>";
-		};
-		904790A22ED1C16B002ACDCC /* Assets3d */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Assets3d;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -70,20 +65,9 @@
 		904790602ED1BFDB002ACDCC = {
 			isa = PBXGroup;
 			children = (
-				904790A22ED1C16B002ACDCC /* Assets3d */,
 				9047906B2ED1BFDB002ACDCC /* realitykit-ragdolls */,
-				9047906A2ED1BFDB002ACDCC /* Products */,
+				908251252ED35FE70096DA1F /* realitykit-ragdolls.app */,
 			);
-			sourceTree = "<group>";
-		};
-		9047906A2ED1BFDB002ACDCC /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				904790692ED1BFDB002ACDCC /* realitykit-ragdolls.app */,
-				904790762ED1BFDC002ACDCC /* realitykit-ragdollsTests.xctest */,
-				904790802ED1BFDC002ACDCC /* realitykit-ragdollsUITests.xctest */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -103,13 +87,12 @@
 			);
 			fileSystemSynchronizedGroups = (
 				9047906B2ED1BFDB002ACDCC /* realitykit-ragdolls */,
-				904790A22ED1C16B002ACDCC /* Assets3d */,
 			);
 			name = "realitykit-ragdolls";
 			packageProductDependencies = (
 			);
 			productName = "realitykit-ragdolls";
-			productReference = 904790692ED1BFDB002ACDCC /* realitykit-ragdolls.app */;
+			productReference = 908251252ED35FE70096DA1F /* realitykit-ragdolls.app */;
 			productType = "com.apple.product-type.application";
 		};
 		904790752ED1BFDC002ACDCC /* realitykit-ragdollsTests */ = {
@@ -185,7 +168,7 @@
 			mainGroup = 904790602ED1BFDB002ACDCC;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 9047906A2ED1BFDB002ACDCC /* Products */;
+			productRefGroup = 904790602ED1BFDB002ACDCC;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -394,6 +377,7 @@
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -431,6 +415,7 @@
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
