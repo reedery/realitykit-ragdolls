@@ -18,11 +18,9 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            // RealityKit 3D View
-            RealityView { content in
-                await setupScene(content: content)
-            }
-            .ignoresSafeArea()
+            // RealityKit 3D Scene
+            RealitySceneView(viewModel: viewModel)
+                .ignoresSafeArea()
 
             // Error overlay
             if let error = viewModel.loadingError {
@@ -41,23 +39,6 @@ struct ContentView: View {
                     .cornerRadius(10)
             }
         }
-    }
-
-    // MARK: - Private Methods
-
-    /// Sets up the RealityKit scene
-    private func setupScene(content: RealityViewContent) async {
-        // Load the USDZ model
-        guard let modelEntity = await viewModel.loadModelEntity() else {
-            return
-        }
-
-        // Create an anchor at the origin
-        let anchor = AnchorEntity(world: .zero)
-        anchor.addChild(modelEntity)
-
-        // Add the anchor to the scene
-        content.add(anchor)
     }
 }
 
