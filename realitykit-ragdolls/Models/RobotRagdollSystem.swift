@@ -108,31 +108,81 @@ enum JointType {
 
 class JointConstraintBuilder {
 
-    /// Creates a ball-and-socket joint (spherical)
+    /// Creates a ball-and-socket joint (spherical) using entity pins
     static func createBallJoint(
-        between entityA: Entity,
-        and entityB: Entity,
-        positionA: SIMD3<Float> = .zero,
-        positionB: SIMD3<Float> = .zero
-    ) -> PhysicsSphericalJoint {
-        let pin0 = PhysicsBodyPin(position: positionA, orientation: .init(angle: 0, axis: [0, 1, 0]))
-        let pin1 = PhysicsBodyPin(position: positionB, orientation: .init(angle: 0, axis: [0, 1, 0]))
-        return PhysicsSphericalJoint(pin0: pin0, pin1: pin1)
+        parent: Entity,
+        parentOffset: SIMD3<Float>,
+        child: Entity,
+        childOffset: SIMD3<Float>,
+        coneLimitRadians: Float = .pi / 4
+    ) throws {
+        // Create pin on parent
+        let parentPin = parent.pins.set(
+            named: "\(parent.name ?? "parent")_pin",
+            position: parentOffset
+        )
+
+        // Create pin on child
+        let childPin = child.pins.set(
+            named: "\(child.name ?? "child")_pin",
+            position: childOffset
+        )
+
+        // Create spherical joint
+        var joint = PhysicsSphericalJoint(
+            pin0: parentPin,
+            pin1: childPin
+        )
+
+        // Set the angular limit (cone shape)
+        joint.angularLimitInYZ = (coneLimitRadians, coneLimitRadians)
+
+        // Add the joint to the simulation
+        try joint.addToSimulation()
     }
 
-    /// Creates a hinge joint (revolute)
+    /// Creates a hinge joint (revolute) using entity pins
     static func createHingeJoint(
-        between entityA: Entity,
-        and entityB: Entity,
-        positionA: SIMD3<Float> = .zero,
-        positionB: SIMD3<Float> = .zero,
-        axis: SIMD3<Float> = [1, 0, 0]
-    ) -> PhysicsRevoluteJoint {
-        let orientationA = simd_quatf(angle: 0, axis: axis)
-        let orientationB = simd_quatf(angle: 0, axis: axis)
-        let pin0 = PhysicsBodyPin(position: positionA, orientation: orientationA)
-        let pin1 = PhysicsBodyPin(position: positionB, orientation: orientationB)
-        return PhysicsRevoluteJoint(pin0: pin0, pin1: pin1)
+        parent: Entity,
+        parentOffset: SIMD3<Float>,
+        child: Entity,
+        childOffset: SIMD3<Float>,
+        axis: SIMD3<Float>,
+        minAngle: Float? = nil,
+        maxAngle: Float? = nil
+    ) throws {
+        // Create orientation for the joint axis
+        let hingeOrientation = simd_quatf(from: [1, 0, 0], to: axis)
+
+        // Create pin on parent
+        let parentPin = parent.pins.set(
+            named: "\(parent.name ?? "parent")_pin",
+            position: parentOffset,
+            orientation: hingeOrientation
+        )
+
+        // Create pin on child
+        let childPin = child.pins.set(
+            named: "\(child.name ?? "child")_pin",
+            position: childOffset,
+            orientation: hingeOrientation
+        )
+
+        // Create revolute joint with angle limits if provided
+        let joint: PhysicsRevoluteJoint
+
+        if let minAngle = minAngle, let maxAngle = maxAngle {
+            joint = PhysicsRevoluteJoint(
+                pin0: parentPin,
+                pin1: childPin,
+                angularLimit: minAngle...maxAngle
+            )
+        } else {
+            joint = PhysicsRevoluteJoint(pin0: parentPin, pin1: childPin)
+        }
+
+        // Add the joint to the simulation
+        try joint.addToSimulation()
     }
 }
 
@@ -153,21 +203,17 @@ class RobotRagdollSystem {
         guard let characterModel = try? await loadRobotModel(named: modelPath) else {
             print("Failed to load robot model, creating procedural ragdoll")
             createProceduralRagdoll(rootEntity: ragdollRoot)
-            try setupJointConstraints()
+            setupJointConstraints()
             enableRagdollPhysics()
             return ragdollRoot
         }
 
-        // Check for skeleton
-        if characterModel.components.has(SkeletalPoseComponent.self) {
-            print("Processing skeleton-based ragdoll")
-            try await processSkeletonBones(from: characterModel, rootEntity: ragdollRoot)
-        } else {
-            print("No skeleton found, creating procedural ragdoll")
-            createProceduralRagdoll(rootEntity: ragdollRoot)
-        }
+        // For now, always use procedural ragdoll
+        // Skeleton processing would require specific USDZ structure knowledge
+        print("Creating procedural ragdoll")
+        createProceduralRagdoll(rootEntity: ragdollRoot)
 
-        try setupJointConstraints()
+        setupJointConstraints()
         enableRagdollPhysics()
 
         rootEntity = ragdollRoot
@@ -320,7 +366,7 @@ class RobotRagdollSystem {
 
     // MARK: - Joint Constraints
 
-    private func setupJointConstraints() throws {
+    private func setupJointConstraints() {
         // Define bone connections with joint types
         let boneConnections: [(parent: RobotBone, child: RobotBone, jointType: JointType)] = [
             // Spine chain
@@ -358,24 +404,29 @@ class RobotRagdollSystem {
                 continue
             }
 
-            switch connection.jointType {
-            case .hinge:
-                let joint = JointConstraintBuilder.createHingeJoint(
-                    between: parentEntity,
-                    and: childEntity,
-                    positionA: getConnectionPoint(from: connection.parent, to: connection.child),
-                    positionB: getConnectionPoint(from: connection.child, to: connection.parent),
-                    axis: SIMD3<Float>(1, 0, 0)
-                )
-                parentEntity.jointWith(childEntity, using: joint)
-            case .ballSocket:
-                let joint = JointConstraintBuilder.createBallJoint(
-                    between: parentEntity,
-                    and: childEntity,
-                    positionA: getConnectionPoint(from: connection.parent, to: connection.child),
-                    positionB: getConnectionPoint(from: connection.child, to: connection.parent)
-                )
-                parentEntity.jointWith(childEntity, using: joint)
+            do {
+                switch connection.jointType {
+                case .hinge:
+                    try JointConstraintBuilder.createHingeJoint(
+                        parent: parentEntity,
+                        parentOffset: getConnectionPoint(from: connection.parent, to: connection.child),
+                        child: childEntity,
+                        childOffset: getConnectionPoint(from: connection.child, to: connection.parent),
+                        axis: SIMD3<Float>(1, 0, 0),
+                        minAngle: -.pi / 2,
+                        maxAngle: .pi / 2
+                    )
+                case .ballSocket:
+                    try JointConstraintBuilder.createBallJoint(
+                        parent: parentEntity,
+                        parentOffset: getConnectionPoint(from: connection.parent, to: connection.child),
+                        child: childEntity,
+                        childOffset: getConnectionPoint(from: connection.child, to: connection.parent),
+                        coneLimitRadians: .pi / 4
+                    )
+                }
+            } catch {
+                print("Failed to create joint between \(connection.parent) and \(connection.child): \(error)")
             }
         }
     }
