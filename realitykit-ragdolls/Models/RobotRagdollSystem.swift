@@ -22,55 +22,86 @@ struct RagdollConfiguration {
 // MARK: - Robot Bone Enum
 
 enum RobotBone: String, CaseIterable {
-    case pelvis, spine, chest, neck, head
-    case leftShoulder, leftUpperArm, leftForearm, leftHand
-    case rightShoulder, rightUpperArm, rightForearm, rightHand
-    case leftThigh, leftShin, leftFoot
-    case rightThigh, rightShin, rightFoot
+    case pelvis = "pelvis"
+    case spine = "spine"
+    case chest = "chest"
+    case neck = "neck"
+    case head = "head"
+    case leftShoulder = "left_shoulder"
+    case leftUpperArm = "left_upper_arm"
+    case leftForearm = "left_forearm"
+    case leftHand = "left_hand"
+    case rightShoulder = "right_shoulder"
+    case rightUpperArm = "right_upper_arm"
+    case rightForearm = "right_forearm"
+    case rightHand = "right_hand"
+    case leftThigh = "left_thigh"
+    case leftShin = "left_shin"
+    case leftFoot = "left_foot"
+    case rightThigh = "right_thigh"
+    case rightShin = "right_shin"
+    case rightFoot = "right_foot"
 
     var colliderRadius: Float {
         switch self {
-        case .pelvis, .spine, .chest:
-            return 0.08
-        case .neck:
-            return 0.04
         case .head:
+            return 0.1
+        case .chest:
+            return 0.15
+        case .pelvis:
+            return 0.12
+        case .spine:
+            return 0.1
+        case .neck:
             return 0.06
         case .leftShoulder, .rightShoulder:
-            return 0.05
+            return 0.07
         case .leftUpperArm, .rightUpperArm, .leftThigh, .rightThigh:
-            return 0.04
+            return 0.06
         case .leftForearm, .rightForearm, .leftShin, .rightShin:
-            return 0.035
-        case .leftHand, .rightHand, .leftFoot, .rightFoot:
+            return 0.05
+        case .leftHand, .rightHand:
             return 0.03
+        case .leftFoot, .rightFoot:
+            return 0.04
         }
     }
 
     var mass: Float {
         switch self {
-        case .pelvis, .spine, .chest:
-            return 2.0
-        case .neck:
-            return 0.3
         case .head:
-            return 1.0
+            return 4.0
+        case .chest:
+            return 15.0
+        case .pelvis:
+            return 10.0
+        case .spine:
+            return 8.0
+        case .neck:
+            return 2.0
         case .leftShoulder, .rightShoulder:
-            return 0.5
+            return 2.5
         case .leftUpperArm, .rightUpperArm:
-            return 0.8
+            return 3.0
         case .leftForearm, .rightForearm:
-            return 0.6
+            return 2.0
         case .leftHand, .rightHand:
-            return 0.3
+            return 1.0
         case .leftThigh, .rightThigh:
-            return 1.2
+            return 7.0
         case .leftShin, .rightShin:
-            return 0.9
+            return 4.0
         case .leftFoot, .rightFoot:
-            return 0.4
+            return 1.5
         }
     }
+}
+
+// MARK: - Joint Type
+
+enum JointType {
+    case hinge
+    case ballSocket
 }
 
 // MARK: - Joint Constraint Builder
@@ -209,41 +240,45 @@ class RobotRagdollSystem {
     // MARK: - Procedural Ragdoll
 
     private func createProceduralRagdoll(rootEntity: Entity) {
-        // Create basic humanoid structure
+        // Create T-pose humanoid structure (more realistic proportions)
         let positions: [RobotBone: SIMD3<Float>] = [
-            .pelvis: [0, 0.9, 0],
-            .spine: [0, 1.1, 0],
-            .chest: [0, 1.3, 0],
-            .neck: [0, 1.5, 0],
-            .head: [0, 1.65, 0],
+            .pelvis: [0, 1.0, 0],
+            .spine: [0, 1.2, 0],
+            .chest: [0, 1.4, 0],
+            .neck: [0, 1.6, 0],
+            .head: [0, 1.8, 0],
 
-            // Left arm
-            .leftShoulder: [-0.15, 1.35, 0],
-            .leftUpperArm: [-0.3, 1.2, 0],
-            .leftForearm: [-0.5, 1.0, 0],
-            .leftHand: [-0.65, 0.85, 0],
+            // Left arm (T-pose)
+            .leftShoulder: [-0.15, 1.5, 0],
+            .leftUpperArm: [-0.35, 1.5, 0],
+            .leftForearm: [-0.55, 1.5, 0],
+            .leftHand: [-0.7, 1.5, 0],
 
-            // Right arm
-            .rightShoulder: [0.15, 1.35, 0],
-            .rightUpperArm: [0.3, 1.2, 0],
-            .rightForearm: [0.5, 1.0, 0],
-            .rightHand: [0.65, 0.85, 0],
+            // Right arm (T-pose)
+            .rightShoulder: [0.15, 1.5, 0],
+            .rightUpperArm: [0.35, 1.5, 0],
+            .rightForearm: [0.55, 1.5, 0],
+            .rightHand: [0.7, 1.5, 0],
 
             // Left leg
-            .leftThigh: [-0.1, 0.6, 0],
-            .leftShin: [-0.1, 0.3, 0],
+            .leftThigh: [-0.1, 0.8, 0],
+            .leftShin: [-0.1, 0.4, 0],
             .leftFoot: [-0.1, 0.05, 0],
 
             // Right leg
-            .rightThigh: [0.1, 0.6, 0],
-            .rightShin: [0.1, 0.3, 0],
+            .rightThigh: [0.1, 0.8, 0],
+            .rightShin: [0.1, 0.4, 0],
             .rightFoot: [0.1, 0.05, 0]
         ]
 
         for bone in RobotBone.allCases {
             guard let position = positions[bone] else { continue }
 
-            let transform = Transform(translation: position)
+            let transform = Transform(
+                scale: .one,
+                rotation: simd_quatf(),
+                translation: position
+            )
             let boneEntity = createBoneEntity(bone: bone, transform: transform)
             boneEntity.name = bone.rawValue
             boneEntities[bone] = boneEntity
@@ -257,7 +292,7 @@ class RobotRagdollSystem {
         let entity = Entity()
         entity.transform = transform
 
-        // Create visual representation (sphere for now)
+        // Create visual representation (sphere)
         let mesh = MeshResource.generateSphere(radius: bone.colliderRadius)
         var material = PhysicallyBasedMaterial()
         material.baseColor = PhysicallyBasedMaterial.BaseColor(
@@ -267,6 +302,18 @@ class RobotRagdollSystem {
         material.metallic = 0.2
 
         entity.components.set(ModelComponent(mesh: mesh, materials: [material]))
+
+        // Collision with filtering to prevent self-collision
+        let collisionShape = ShapeResource.generateSphere(radius: bone.colliderRadius)
+        let collision = CollisionComponent(
+            shapes: [collisionShape],
+            mode: .default,
+            filter: CollisionFilter(
+                group: .init(rawValue: 1 << 1),
+                mask: .all.subtracting(.init(rawValue: 1 << 1))
+            )
+        )
+        entity.components.set(collision)
 
         // Physics body
         var physicsBody = PhysicsBodyComponent(
@@ -278,14 +325,17 @@ class RobotRagdollSystem {
             ),
             mode: .dynamic
         )
+
+        // Set initial velocities to zero
+        physicsBody.linearVelocity = .zero
+        physicsBody.angularVelocity = .zero
+
+        // Add damping for stability
         physicsBody.linearDamping = config.linearDamping
         physicsBody.angularDamping = config.angularDamping
+        physicsBody.isAffectedByGravity = true
 
         entity.components.set(physicsBody)
-
-        // Collision
-        let collisionShape = ShapeResource.generateSphere(radius: bone.colliderRadius)
-        entity.components.set(CollisionComponent(shapes: [collisionShape]))
 
         // Make torso/pelvis draggable
         if bone == .pelvis || bone == .chest {
@@ -315,80 +365,88 @@ class RobotRagdollSystem {
     // MARK: - Joint Constraints
 
     private func setupJointConstraints() throws {
-        // Spine joints (ball joints)
-        createJointIfExists(.pelvis, .spine, coneAngle: .pi / 6)
-        createJointIfExists(.spine, .chest, coneAngle: .pi / 6)
-        createJointIfExists(.chest, .neck, coneAngle: .pi / 4)
-        createJointIfExists(.neck, .head, coneAngle: .pi / 3)
+        // Define bone connections with joint types
+        let boneConnections: [(parent: RobotBone, child: RobotBone, jointType: JointType)] = [
+            // Spine chain
+            (.pelvis, .spine, .ballSocket),
+            (.spine, .chest, .ballSocket),
+            (.chest, .neck, .ballSocket),
+            (.neck, .head, .ballSocket),
 
-        // Shoulder joints (ball joints)
-        createJointIfExists(.chest, .leftShoulder, coneAngle: .pi / 3)
-        createJointIfExists(.leftShoulder, .leftUpperArm, coneAngle: .pi / 2)
-        createJointIfExists(.chest, .rightShoulder, coneAngle: .pi / 3)
-        createJointIfExists(.rightShoulder, .rightUpperArm, coneAngle: .pi / 2)
+            // Left arm
+            (.chest, .leftShoulder, .ballSocket),
+            (.leftShoulder, .leftUpperArm, .ballSocket),
+            (.leftUpperArm, .leftForearm, .hinge),
+            (.leftForearm, .leftHand, .ballSocket),
 
-        // Elbow joints (hinge joints)
-        createHingeJointIfExists(.leftUpperArm, .leftForearm, axis: [0, 0, 1], minAngle: 0, maxAngle: .pi * 0.8)
-        createHingeJointIfExists(.rightUpperArm, .rightForearm, axis: [0, 0, 1], minAngle: -.pi * 0.8, maxAngle: 0)
+            // Right arm
+            (.chest, .rightShoulder, .ballSocket),
+            (.rightShoulder, .rightUpperArm, .ballSocket),
+            (.rightUpperArm, .rightForearm, .hinge),
+            (.rightForearm, .rightHand, .ballSocket),
 
-        // Wrist joints (ball joints with small cone)
-        createJointIfExists(.leftForearm, .leftHand, coneAngle: .pi / 4)
-        createJointIfExists(.rightForearm, .rightHand, coneAngle: .pi / 4)
+            // Left leg
+            (.pelvis, .leftThigh, .ballSocket),
+            (.leftThigh, .leftShin, .hinge),
+            (.leftShin, .leftFoot, .hinge),
 
-        // Hip joints (ball joints)
-        createJointIfExists(.pelvis, .leftThigh, coneAngle: .pi / 3)
-        createJointIfExists(.pelvis, .rightThigh, coneAngle: .pi / 3)
+            // Right leg
+            (.pelvis, .rightThigh, .ballSocket),
+            (.rightThigh, .rightShin, .hinge),
+            (.rightShin, .rightFoot, .hinge)
+        ]
 
-        // Knee joints (hinge joints)
-        createHingeJointIfExists(.leftThigh, .leftShin, axis: [0, 0, 1], minAngle: -.pi * 0.8, maxAngle: 0)
-        createHingeJointIfExists(.rightThigh, .rightShin, axis: [0, 0, 1], minAngle: -.pi * 0.8, maxAngle: 0)
+        for connection in boneConnections {
+            guard let parentEntity = boneEntities[connection.parent],
+                  let childEntity = boneEntities[connection.child] else {
+                continue
+            }
 
-        // Ankle joints (ball joints with small cone)
-        createJointIfExists(.leftShin, .leftFoot, coneAngle: .pi / 6)
-        createJointIfExists(.rightShin, .rightFoot, coneAngle: .pi / 6)
+            let joint: PhysicsJointComponent
+
+            switch connection.jointType {
+            case .hinge:
+                joint = JointConstraintBuilder.createHingeJoint(
+                    between: parentEntity,
+                    and: childEntity,
+                    anchorA: getConnectionPoint(from: connection.parent, to: connection.child),
+                    anchorB: getConnectionPoint(from: connection.child, to: connection.parent),
+                    axis: SIMD3<Float>(1, 0, 0),
+                    minAngle: -.pi / 2,
+                    maxAngle: .pi / 2
+                )
+            case .ballSocket:
+                joint = JointConstraintBuilder.createBallJoint(
+                    between: parentEntity,
+                    and: childEntity,
+                    anchorA: getConnectionPoint(from: connection.parent, to: connection.child),
+                    anchorB: getConnectionPoint(from: connection.child, to: connection.parent),
+                    coneAngle: .pi / 4
+                )
+            }
+
+            // Add joint to parent entity
+            parentEntity.components.set(joint)
+        }
     }
 
-    private func createJointIfExists(_ boneA: RobotBone, _ boneB: RobotBone, coneAngle: Float) {
-        guard let entityA = boneEntities[boneA],
-              let entityB = boneEntities[boneB] else { return }
-
-        let joint = JointConstraintBuilder.createBallJoint(
-            between: entityA,
-            and: entityB,
-            anchorA: [0, 0, 0],
-            anchorB: [0, 0, 0],
-            coneAngle: coneAngle
-        )
-        entityA.components.set(joint)
-    }
-
-    private func createHingeJointIfExists(
-        _ boneA: RobotBone,
-        _ boneB: RobotBone,
-        axis: SIMD3<Float>,
-        minAngle: Float,
-        maxAngle: Float
-    ) {
-        guard let entityA = boneEntities[boneA],
-              let entityB = boneEntities[boneB] else { return }
-
-        let joint = JointConstraintBuilder.createHingeJoint(
-            between: entityA,
-            and: entityB,
-            anchorA: [0, 0, 0],
-            anchorB: [0, 0, 0],
-            axis: axis,
-            minAngle: minAngle,
-            maxAngle: maxAngle
-        )
-        entityA.components.set(joint)
+    /// Calculate connection points between bones
+    private func getConnectionPoint(from bone: RobotBone, to targetBone: RobotBone) -> SIMD3<Float> {
+        // For simplified version, return offset based on bone's collider radius
+        // This creates connection points at the edges of the spheres
+        return SIMD3<Float>(0, bone.colliderRadius * 0.5, 0)
     }
 
     // MARK: - Physics
 
     private func enableRagdollPhysics() {
-        // Physics is already enabled in createBoneEntity
-        // This method can be used for additional physics setup if needed
+        for (_, entity) in boneEntities {
+            if var physicsBody = entity.components[PhysicsBodyComponent.self] {
+                physicsBody.mode = .dynamic
+                physicsBody.isAffectedByGravity = true
+                entity.components.set(physicsBody)
+            }
+        }
         print("Ragdoll physics enabled with \(boneEntities.count) bones")
     }
 
@@ -396,5 +454,26 @@ class RobotRagdollSystem {
 
     func getDraggableEntity() -> Entity? {
         return boneEntities[.chest] ?? boneEntities[.pelvis]
+    }
+
+    /// Apply an impulse to trigger ragdoll effect
+    func applyImpulse(force: SIMD3<Float>, to bone: RobotBone) {
+        guard let entity = boneEntities[bone],
+              var physicsBody = entity.components[PhysicsBodyComponent.self] else {
+            return
+        }
+
+        physicsBody.applyLinearImpulse(force, relativeTo: nil)
+        entity.components.set(physicsBody)
+    }
+
+    /// Switch between animated and ragdoll mode
+    func setRagdollEnabled(_ enabled: Bool) {
+        for (_, entity) in boneEntities {
+            if var physicsBody = entity.components[PhysicsBodyComponent.self] {
+                physicsBody.mode = enabled ? .dynamic : .kinematic
+                entity.components.set(physicsBody)
+            }
+        }
     }
 }
