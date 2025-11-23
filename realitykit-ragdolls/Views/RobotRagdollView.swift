@@ -124,9 +124,9 @@ class RobotRagdollViewModel: ObservableObject {
             print("Creating robot ragdoll...")
             let ragdoll = try await ragdollSystem.createRagdoll()
 
-            // Position the ragdoll above the ground
+            // Position the ragdoll above the ground (scaled up 100x)
             let ragdollParent = Entity()
-            ragdollParent.position = [0, 1.5, -2.0]
+            ragdollParent.position = [0, 150, -200]  // Scaled up from [0, 1.5, -2.0]
             ragdollParent.addChild(ragdoll)
             physicsWorld.addChild(ragdollParent)
 
@@ -154,8 +154,8 @@ class RobotRagdollViewModel: ObservableObject {
         let ground = Entity()
         ground.name = "ground"
 
-        // Visual mesh
-        let mesh = MeshResource.generatePlane(width: 20, depth: 20)
+        // Visual mesh (scaled up 100x)
+        let mesh = MeshResource.generatePlane(width: 2000, depth: 2000)
         var material = PhysicallyBasedMaterial()
         material.baseColor = PhysicallyBasedMaterial.BaseColor(
             tint: UIColor(red: 0.3, green: 0.6, blue: 0.2, alpha: 1.0)
@@ -164,8 +164,8 @@ class RobotRagdollViewModel: ObservableObject {
         material.metallic = PhysicallyBasedMaterial.Metallic(floatLiteral: 0.0)
         ground.components.set(ModelComponent(mesh: mesh, materials: [material]))
 
-        // Physics
-        let groundShape = ShapeResource.generateBox(width: 20, height: 0.2, depth: 20)
+        // Physics (scaled up 100x)
+        let groundShape = ShapeResource.generateBox(width: 2000, height: 20, depth: 2000)
         let physicsBody = PhysicsBodyComponent(
             shapes: [groundShape],
             mass: 0,
@@ -179,7 +179,7 @@ class RobotRagdollViewModel: ObservableObject {
         ground.components.set(physicsBody)
         ground.components.set(CollisionComponent(shapes: [groundShape]))
 
-        ground.position = [0, -0.1, -2.0]
+        ground.position = [0, -10, -200]  // Scaled up from [0, -0.1, -2.0]
 
         return ground
     }

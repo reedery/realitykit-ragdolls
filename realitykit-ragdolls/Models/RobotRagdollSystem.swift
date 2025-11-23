@@ -43,27 +43,28 @@ enum RobotBone: String, CaseIterable {
     case rightFoot = "right_foot"
 
     var colliderRadius: Float {
+        let scale: Float = 100.0
         switch self {
         case .head:
-            return 0.1
+            return 0.1 * scale
         case .chest:
-            return 0.15
+            return 0.15 * scale
         case .pelvis:
-            return 0.12
+            return 0.12 * scale
         case .spine:
-            return 0.1
+            return 0.1 * scale
         case .neck:
-            return 0.06
+            return 0.06 * scale
         case .leftShoulder, .rightShoulder:
-            return 0.07
+            return 0.07 * scale
         case .leftUpperArm, .rightUpperArm, .leftThigh, .rightThigh:
-            return 0.06
+            return 0.06 * scale
         case .leftForearm, .rightForearm, .leftShin, .rightShin:
-            return 0.05
+            return 0.05 * scale
         case .leftHand, .rightHand:
-            return 0.03
+            return 0.03 * scale
         case .leftFoot, .rightFoot:
-            return 0.04
+            return 0.04 * scale
         }
     }
 
@@ -247,35 +248,36 @@ class RobotRagdollSystem {
     // MARK: - Procedural Ragdoll
 
     private func createProceduralRagdoll(rootEntity: Entity) {
-        // Create T-pose humanoid structure (more realistic proportions)
+        // Create T-pose humanoid structure (scaled up 100x for visibility)
+        let scale: Float = 100.0
         let positions: [RobotBone: SIMD3<Float>] = [
-            .pelvis: [0, 1.0, 0],
-            .spine: [0, 1.2, 0],
-            .chest: [0, 1.4, 0],
-            .neck: [0, 1.6, 0],
-            .head: [0, 1.8, 0],
+            .pelvis: [0, 1.0 * scale, 0],
+            .spine: [0, 1.2 * scale, 0],
+            .chest: [0, 1.4 * scale, 0],
+            .neck: [0, 1.6 * scale, 0],
+            .head: [0, 1.8 * scale, 0],
 
             // Left arm (T-pose)
-            .leftShoulder: [-0.15, 1.5, 0],
-            .leftUpperArm: [-0.35, 1.5, 0],
-            .leftForearm: [-0.55, 1.5, 0],
-            .leftHand: [-0.7, 1.5, 0],
+            .leftShoulder: [-0.15 * scale, 1.5 * scale, 0],
+            .leftUpperArm: [-0.35 * scale, 1.5 * scale, 0],
+            .leftForearm: [-0.55 * scale, 1.5 * scale, 0],
+            .leftHand: [-0.7 * scale, 1.5 * scale, 0],
 
             // Right arm (T-pose)
-            .rightShoulder: [0.15, 1.5, 0],
-            .rightUpperArm: [0.35, 1.5, 0],
-            .rightForearm: [0.55, 1.5, 0],
-            .rightHand: [0.7, 1.5, 0],
+            .rightShoulder: [0.15 * scale, 1.5 * scale, 0],
+            .rightUpperArm: [0.35 * scale, 1.5 * scale, 0],
+            .rightForearm: [0.55 * scale, 1.5 * scale, 0],
+            .rightHand: [0.7 * scale, 1.5 * scale, 0],
 
             // Left leg
-            .leftThigh: [-0.1, 0.8, 0],
-            .leftShin: [-0.1, 0.4, 0],
-            .leftFoot: [-0.1, 0.05, 0],
+            .leftThigh: [-0.1 * scale, 0.8 * scale, 0],
+            .leftShin: [-0.1 * scale, 0.4 * scale, 0],
+            .leftFoot: [-0.1 * scale, 0.05 * scale, 0],
 
             // Right leg
-            .rightThigh: [0.1, 0.8, 0],
-            .rightShin: [0.1, 0.4, 0],
-            .rightFoot: [0.1, 0.05, 0]
+            .rightThigh: [0.1 * scale, 0.8 * scale, 0],
+            .rightShin: [0.1 * scale, 0.4 * scale, 0],
+            .rightFoot: [0.1 * scale, 0.05 * scale, 0]
         ]
 
         for bone in RobotBone.allCases {
